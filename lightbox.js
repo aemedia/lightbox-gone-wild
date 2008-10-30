@@ -67,7 +67,13 @@ function checkIt(string) {
 
 Event.observe(window, 'load', initializeLightBox, false);
 Event.observe(window, 'load', getBrowserInfo, false);
-Event.observe(window, 'unload', Event.unloadCache, false);
+
+//Event.unloadCache was designed to prevent memory leaks in IE
+//however, it throws an error when used with prototype 1.6
+//according to this doc: http://www.prototypejs.org/api/event/unloadCache
+//the cache is automatically unloaded on window unload
+//so, we've disabled this method call:
+//Event.observe(window, 'unload', Event.unloadCache, false);
 
 var lightbox = Class.create();
 
