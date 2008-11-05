@@ -19,6 +19,11 @@ Modified by Chris to allow for
 - setting the method to 'get' by including the 'lbGet' class
 */
 
+/**
+Modified by Murray Steele to add new browser detect stuff and not do some of the
+extra work for IE when you're using IE 7.
+*/
+
 
 /*-------------------------------GLOBAL VARIABLES------------------------------------*/
 
@@ -27,46 +32,121 @@ var OS,browser,version,total,thestring;
 
 /*-----------------------------------------------------------------------------------------------*/
 
-//Browser detect script origionally created by Peter Paul Koch at http://www.quirksmode.org/
+//Browser detect script from http://www.quirksmode.org/js/detect.html 
+var BrowserDetect = {
+	init: function () {
+		this.browser = this.searchString(this.dataBrowser) || "An unknown browser";
+		this.version = this.searchVersion(navigator.userAgent)
+			|| this.searchVersion(navigator.appVersion)
+			|| "an unknown version";
+		this.OS = this.searchString(this.dataOS) || "an unknown OS";
+	},
+	searchString: function (data) {
+		for (var i=0;i<data.length;i++)	{
+			var dataString = data[i].string;
+			var dataProp = data[i].prop;
+			this.versionSearchString = data[i].versionSearch || data[i].identity;
+			if (dataString) {
+				if (dataString.indexOf(data[i].subString) != -1)
+					return data[i].identity;
+			}
+			else if (dataProp)
+				return data[i].identity;
+		}
+	},
+	searchVersion: function (dataString) {
+		var index = dataString.indexOf(this.versionSearchString);
+		if (index == -1) return;
+		return parseFloat(dataString.substring(index+this.versionSearchString.length+1));
+	},
+	dataBrowser: [
+		{
+			string: navigator.userAgent,
+			subString: "Chrome",
+			identity: "Chrome"
+		},
+		{ 	string: navigator.userAgent,
+			subString: "OmniWeb",
+			versionSearch: "OmniWeb/",
+			identity: "OmniWeb"
+		},
+		{
+			string: navigator.vendor,
+			subString: "Apple",
+			identity: "Safari"
+		},
+		{
+			prop: window.opera,
+			identity: "Opera"
+		},
+		{
+			string: navigator.vendor,
+			subString: "iCab",
+			identity: "iCab"
+		},
+		{
+			string: navigator.vendor,
+			subString: "KDE",
+			identity: "Konqueror"
+		},
+		{
+			string: navigator.userAgent,
+			subString: "Firefox",
+			identity: "Firefox"
+		},
+		{
+			string: navigator.vendor,
+			subString: "Camino",
+			identity: "Camino"
+		},
+		{		// for newer Netscapes (6+)
+			string: navigator.userAgent,
+			subString: "Netscape",
+			identity: "Netscape"
+		},
+		{
+			string: navigator.userAgent,
+			subString: "MSIE",
+			identity: "Explorer",
+			versionSearch: "MSIE"
+		},
+		{
+			string: navigator.userAgent,
+			subString: "Gecko",
+			identity: "Mozilla",
+			versionSearch: "rv"
+		},
+		{ 		// for older Netscapes (4-)
+			string: navigator.userAgent,
+			subString: "Mozilla",
+			identity: "Netscape",
+			versionSearch: "Mozilla"
+		}
+	],
+	dataOS : [
+		{
+			string: navigator.platform,
+			subString: "Win",
+			identity: "Windows"
+		},
+		{
+			string: navigator.platform,
+			subString: "Mac",
+			identity: "Mac"
+		},
+		{
+			string: navigator.platform,
+			subString: "Linux",
+			identity: "Linux"
+		}
+	]
 
-function getBrowserInfo() {
-	if (checkIt('konqueror')) {
-		browser = "Konqueror";
-		OS = "Linux";
-	}
-	else if (checkIt('safari')) browser 	= "Safari"
-	else if (checkIt('omniweb')) browser 	= "OmniWeb"
-	else if (checkIt('opera')) browser 		= "Opera"
-	else if (checkIt('webtv')) browser 		= "WebTV";
-	else if (checkIt('icab')) browser 		= "iCab"
-	else if (checkIt('msie')) browser 		= "Internet Explorer"
-	else if (!checkIt('compatible')) {
-		browser = "Netscape Navigator"
-		version = detect.charAt(8);
-	}
-	else browser = "An unknown browser";
-
-	if (!version) version = detect.charAt(place + thestring.length);
-
-	if (!OS) {
-		if (checkIt('linux')) OS 		= "Linux";
-		else if (checkIt('x11')) OS 	= "Unix";
-		else if (checkIt('mac')) OS 	= "Mac"
-		else if (checkIt('win')) OS 	= "Windows"
-		else OS 								= "an unknown operating system";
-	}
-}
-
-function checkIt(string) {
-	place = detect.indexOf(string) + 1;
-	thestring = string;
-	return place;
-}
+};
+BrowserDetect.init();
 
 /*-----------------------------------------------------------------------------------------------*/
 
 Event.observe(window, 'load', initializeLightBox, false);
-Event.observe(window, 'load', getBrowserInfo, false);
 
 //Event.unloadCache was designed to prevent memory leaks in IE
 //however, it throws an error when used with prototype 1.6
@@ -91,14 +171,14 @@ lightbox.prototype = {
 	
 	// Turn everything on - mainly the IE fixes
 	activate: function(){
-		if (browser == 'Internet Explorer'){
+		if ((BrowserDetect.browser == 'Explorer') && (BrowserDetect.version < 7)) {
 			this.getScroll();
 			this.prepareIE('100%', 'hidden');
 			this.setScroll(0,0);
 			this.hideSelects('hidden');
 		}
 		this.displayLightbox("block");
-		if (browser == 'Internet Explorer'){
+		if ((BrowserDetect.browser == 'Explorer') && (BrowserDetect.version < 7)) {
 		  document.recalc(); // For compatiblity with dean edwards ie7.. how to check I'm using it?
 		}
 	},
@@ -158,7 +238,7 @@ lightbox.prototype = {
 		new Insertion.Before($('lbLoadMessage'), info)
 		$('lightbox').className = "done";	
 		this.actions();		
-		if (browser == 'Internet Explorer'){
+		if ((BrowserDetect.browser == 'Explorer') && (BrowserDetect.version < 7)) {
 		  document.recalc(); // For compatiblity with dean edwards ie7.. how to check I'm using it?
 		}
 	},
@@ -190,7 +270,7 @@ lightbox.prototype = {
 	deactivate: function(){
 		Element.remove($('lbContent'));
 		
-		if (browser == "Internet Explorer"){
+		if ((BrowserDetect.browser == 'Explorer') && (BrowserDetect.version < 7)) {
 			this.setScroll(0,this.yPos);
 			this.prepareIE("auto", "auto");
 			this.hideSelects("visible");
