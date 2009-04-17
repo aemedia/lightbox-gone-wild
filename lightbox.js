@@ -287,10 +287,15 @@ function initializeLightBox(){
 	addLightboxMarkup();
 	lbox = document.getElementsByClassName('lbOn');
 	for(i = 0; i < lbox.length; i++) {
-		valid = new lightbox(lbox[i]);
-		if (Element.hasClassName(lbox[i], 'lbGet'))
-			valid.method = 'get';
+		lightboxizeElement(lbox[i])
 	}
+}
+
+function lightboxizeElement(element){
+  valid = new lightbox(element);
+	if (Element.hasClassName(element, 'lbGet')) {
+		valid.method = 'get';
+  }
 }
 
 // Add in markup necessary to make this work. Basically two divs:
@@ -316,8 +321,6 @@ function reinitializeLightboxDiv(div_id) {
 	var div_element = document.getElementById(div_id);	
 	lbox = div_element.getElementsByClassName('lbOn');
 	for(i = 0; i < lbox.length; i++) {
-		valid = new lightbox(lbox[i]);
-		if (Element.hasClassName(lbox[i], 'lbGet'))
-			valid.method = 'get';
+		lightboxizeElement(lbox[i]);
 	}
 }
