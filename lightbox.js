@@ -161,6 +161,8 @@ lightbox.prototype = {
 
 	yPos : 0,
 	xPos : 0,
+  use_dismiss : false,
+  announce_load : false,
 
 	initialize: function(ctrl) {
 		this.content = ctrl.href;
@@ -237,10 +239,13 @@ lightbox.prototype = {
 		info = "<div id='lbContent'>" + response.responseText + "</div>";
 		new Insertion.Before($('lbLoadMessage'), info)
 		$('lightbox').className = "done";	
-		this.actions();		
+		this.actions();
 		if ((BrowserDetect.browser == 'Explorer') && (BrowserDetect.version < 7)) {
 		  document.recalc(); // For compatiblity with dean edwards ie7.. how to check I'm using it?
 		}
+	  if (this.announce_load) {
+	    $('lightbox').fire('lightbox:loaded', this);
+	  }
 	},
 	
 	// Search through new links within the lightbox, and attach click event
@@ -256,19 +261,26 @@ lightbox.prototype = {
 	
 	// Example of creating your own functionality once lightbox is initiated
 	insert: function(e){
-	   link = Event.element(e).parentNode;
+	   var link = Event.element(e);
 	   Element.remove($('lbContent'));
-	 
+	   
+	   var the_method = 'post';
+     if (Element.hasClassName(link, 'lbGet')) {
+   		 the_method = 'get';
+     }
+     $('lightbox').className = "loading";	
 	   var myAjax = new Ajax.Request(
 			  link.href,
-			  {method: 'post', parameters: "", onComplete: this.processInfo.bindAsEventListener(this)}
+			  {method: the_method, parameters: "", onComplete: this.processInfo.bindAsEventListener(this)}
 	   );
 	 
 	},
 	
 	// Example of creating your own functionality once lightbox is initiated
 	deactivate: function(){
-		Element.remove($('lbContent'));
+		if ($('lbContent')) {
+		  Element.remove($('lbContent'));
+	  }
 		
 		if ((BrowserDetect.browser == 'Explorer') && (BrowserDetect.version < 7)) {
 			this.setScroll(0,this.yPos);
@@ -284,7 +296,7 @@ lightbox.prototype = {
 
 // Onload, make all links that need to trigger a lightbox active
 function initializeLightBox(){
-	addLightboxMarkup();
+  addLightboxMarkup(lightbox.prototype.use_dismiss)
 	lbox = document.getElementsByClassName('lbOn');
 	for(i = 0; i < lbox.length; i++) {
 		lightboxizeElement(lbox[i])
@@ -301,14 +313,21 @@ function lightboxizeElement(element){
 // Add in markup necessary to make this work. Basically two divs:
 // Overlay holds the shadow
 // Lightbox is the centered square that the content is put into.
-function addLightboxMarkup() {
+function addLightboxMarkup(with_dismiss) {
 	bod 				= document.getElementsByTagName('body')[0];
 	overlay 			= document.createElement('div');
 	overlay.id		= 'overlay';
 	lb					= document.createElement('div');
 	lb.id				= 'lightbox';
 	lb.className 	= 'loading';
-	lb.innerHTML	= '<div id="lbLoadMessage">' +
+	var with_dismiss_chrome = '';
+	if ((with_dismiss !== undefined) || (with_dismiss)) {
+	  with_dismiss_chrome = '<div id="lbDismiss">' + 
+  	            '<a href="#" onclick="lightbox.prototype.deactivate();" title="Click to dismiss this box and go back to the page underneath.">Dismiss</a>' +
+  	            '</div>';
+	}
+	lb.innerHTML	= with_dismiss_chrome + 
+	            '<div id="lbLoadMessage">' +
 						  '<p>Loading</p>' +
 						  '</div>';
 	lb.style.display = 'none';
