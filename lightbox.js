@@ -323,7 +323,7 @@ function addLightboxMarkup(with_dismiss) {
 	var with_dismiss_chrome = '';
 	if ((with_dismiss !== undefined) || (with_dismiss)) {
 	  with_dismiss_chrome = '<div id="lbDismiss">' + 
-  	            '<a href="#" onclick="lightbox.prototype.deactivate();" title="Click to dismiss this box and go back to the page underneath.">Dismiss</a>' +
+  	            '<a href="javascript:lightbox.prototype.deactivate();" title="Click to dismiss this box and go back to the page underneath.">Dismiss</a>' +
   	            '</div>';
 	}
 	lb.innerHTML	= with_dismiss_chrome + 
