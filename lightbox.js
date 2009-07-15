@@ -162,6 +162,7 @@ lightbox.prototype = {
 	yPos : 0,
 	xPos : 0,
   use_dismiss : false,
+  dismiss_text : 'Dismiss',
   announce_load : false,
 
 	initialize: function(ctrl) {
@@ -323,7 +324,7 @@ function addLightboxMarkup(with_dismiss) {
 	var with_dismiss_chrome = '';
 	if ((with_dismiss !== undefined) || (with_dismiss)) {
 	  with_dismiss_chrome = '<div id="lbDismiss">' + 
-  	            '<a href="javascript:lightbox.prototype.deactivate();" title="Click to dismiss this box and go back to the page underneath.">Dismiss</a>' +
+  	            '<a href="javascript:lightbox.prototype.deactivate();" title="Click to dismiss this window and go back to the page underneath.">' + lightbox.prototype.dismiss_text + '</a>' +
   	            '</div>';
 	}
 	lb.innerHTML	= with_dismiss_chrome + 
