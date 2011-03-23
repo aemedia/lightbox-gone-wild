@@ -3,7 +3,7 @@ AegisLabs.LightBoxExtensions = {
 	
 	widestChild : function (element, widths){
 		if( $(element).childElements().size() > 0 ){ 
-			$(element).childElements().each( function(element){  widths.push( widestChild( element, widths ) ) } );
+			$(element).childElements().each( function(element){  widths.push( AegisLabs.LightBoxExtensions.widestChild( element, widths ) ) } );
 		}
 		else{
 			return $(element).getDimensions().width
