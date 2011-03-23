@@ -29,7 +29,6 @@ AegisLabs.LightBoxExtensions = {
 	resizeLightBox : function(width, height){		
 		width = AegisLabs.LightBoxExtensions.maxWidth($('lightbox'), width)
 		height = (height == null) ? '550' : height;		
-		alert(height);
 		$('lightbox').morph('width:'+width+'px;'); 
 		$('lightbox').morph('height:'+height+'px;'); 
 	},
