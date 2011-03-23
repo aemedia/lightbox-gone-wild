@@ -10,17 +10,29 @@ AegisLabs.LightBoxExtensions = {
 		}
 	},
 	
-	//Add class 'lbResizable' to the lightbox link to work
-	resizeLightBox : function(){
+	maxWidth : function(element, width){
 		var widths = new Array();
-		AegisLabs.LightBoxExtensions.widestChild( $('lightbox'), widths );
-		var widest = widths.sortBy( function(width){ 
-			return width == null ? 0 : parseInt(width);
-			} ).last();
-			widest += 50;
-			$('lightbox').morph('width:'+widest+'px;'); 
-			$('lightbox').morph('height:550px;'); 
-		},
+		var max = 0;
+		if( width == null ){
+			AegisLabs.LightBoxExtensions.widestChild( element, widths );
+			max = widths.sortBy( function(width){ 
+				return width == null ? 0 : parseInt(width);
+				} ).last();
+			max += 50;
+		}else{
+			max = width;
+		}
+		return max;
+	},
+	
+	//Add class 'lbResizable' to the lightbox link to work
+	resizeLightBox : function(width, height){		
+		width = AegisLabs.LightBoxExtensions.maxWidth($('lightbox'), width)
+		height = (height == null) ? '550' : height;		
+		alert(height);
+		$('lightbox').morph('width:'+width+'px;'); 
+		$('lightbox').morph('height:'+height+'px;'); 
+	},
 		
 	//Add class 'lbStealFocus' to the lightbox link to work
 	setFocusToForm : function(){

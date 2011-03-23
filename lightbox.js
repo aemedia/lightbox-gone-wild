@@ -310,7 +310,7 @@ function lightboxizeElement(element){
 		valid.method = 'get';
   }
 	if( Element.hasClassName(element, 'lbResizable') && typeof AegisLabs != 'undefined' ){
-		document.observe( 'lightbox:loaded', AegisLabs.LightBoxExtensions.resizeLightBox );
+		document.observe( 'lightbox:loaded', AegisLabs.LightBoxExtensions.resizeLightBox(Element.readAttribute(element, "lightbox_width"), Element.readAttribute(element, "lightbox_height")) );
 	}
 	if( Element.hasClassName(element, 'lbStealFocus') && typeof AegisLabs != 'undefined' ){
 		document.observe( 'lightbox:loaded', AegisLabs.LightBoxExtensions.setFocusToForm );
