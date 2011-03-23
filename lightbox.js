@@ -163,7 +163,7 @@ lightbox.prototype = {
 	xPos : 0,
   use_dismiss : false,
   dismiss_text : 'Dismiss',
-  announce_load : false,
+  announce_load : true,
 
 	initialize: function(ctrl) {
 		this.content = ctrl.href;
@@ -309,6 +309,12 @@ function lightboxizeElement(element){
 	if (Element.hasClassName(element, 'lbGet')) {
 		valid.method = 'get';
   }
+	if( Element.hasClassName(element, 'lbResizable') && typeof AegisLabs != 'undefined' ){
+		document.observe( 'lightbox:loaded', AegisLabs.LightBoxExtensions.resizeLightBox );
+	}
+	if( Element.hasClassName(element, 'lbStealFocus') && typeof AegisLabs != 'undefined' ){
+		document.observe( 'lightbox:loaded', AegisLabs.LightBoxExtensions.setFocusToForm );
+	}
 }
 
 // Add in markup necessary to make this work. Basically two divs:
